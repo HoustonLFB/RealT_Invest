@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur de Patrimoine</title>
+</head>
+<body>
+
+    <h1>Calculateur de Patrimoine</h1>
+
+    <label for="initial">Montant initial :</label>
+    <input type="number" id="initial" value="6000">
+    <br>
+    <label for="yearlyInterest">Intérêt annuel :</label>
+    <input type="number" id="yearlyInterest" value="9">
+    <br>
+    <label for="recurrentInvest">Investissement récurrent :</label>
+    <input type="number" id="recurrentInvest" value="200">
+    <br>
+    <label for="investWeekSpan">Nombre de semaines entre les investissements :</label>
+    <input type="number" id="investWeekSpan" value="4">
+    <br>
+    <label for="nbYear">Nombre d'années de calcul :</label>
+    <input type="number" id="nbYear" value="10">
+    <br>
+    <button onclick="calculatePatrimoine()">Calculer</button>
+
+    <br>
+
+    <label for="resultPatrimoine">Patrimoine :</label>
+    <input type="text" id="resultPatrimoine" readonly>
+
+    <label for="resultWeeklyIncome">Revenu hebdomadaire :</label>
+    <input type="text" id="resultWeeklyIncome" readonly>
+
+    <label for="resultDateGrowth">Date du dépassement :</label>
+    <input type="text" id="resultDateGrowth" readonly>
+
+    <script>
+        function calculatePatrimoine() {
+            const initial = parseFloat(document.getElementById('initial').value);
+            const yearlyInterest = parseFloat(document.getElementById('yearlyInterest').value)/100;
+            const recurrentInvest = parseFloat(document.getElementById('recurrentInvest').value);
+            const investWeekSpan = parseInt(document.getElementById('investWeekSpan').value);
+            const nbYear = parseInt(document.getElementById('nbYear').value);
+
+            const weeklyInterest = yearlyInterest / 52;
+
+            const nbWeek = nbYear * 52;
+
+            let interest = 0;
+            let weekGrowth = 0;
+            let patrimoine = initial;
+            let weeklyIncome = 0;
+
+            for (let i = 1; i < nbWeek; i++) {
+                weeklyIncome = patrimoine * weeklyInterest;
+
+                interest += weeklyIncome;
+
+                while (interest > 51) {
+                    interest -= 51;
+                    patrimoine += 51;
+                }
+
+                if (weeklyIncome > 50 && weekGrowth === 0) {
+                    weekGrowth = i;
+                }
+
+                // J'ajoute tous les mois 300€
+                if (i % investWeekSpan === 0) {
+                    patrimoine += recurrentInvest;
+                }
+            }
+
+            // Affichage des résultats dans les inputs
+            document.getElementById('resultPatrimoine').value = patrimoine;
+            document.getElementById('resultWeeklyIncome').value = weeklyIncome.toFixed(2);
+
+            const dateYearGrowth = weekGrowth / 52;
+            const dateWeekGrowth = parseInt((dateYearGrowth - parseInt(dateYearGrowth)) * 52);
+            const dateYearGrowthInt = parseInt(dateYearGrowth);
+
+            document.getElementById('resultDateGrowth').value = `Y${dateYearGrowthInt}, W${dateWeekGrowth}`;
+        }
+    </script>
+</body>
+</html>
